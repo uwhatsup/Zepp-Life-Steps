@@ -1,42 +1,21 @@
 import React, { useState, useEffect } from 'react';
 import axios from 'axios';
-import { Form, Input, Button, message, Card, Typography, Space, Switch, Tooltip, Divider, Statistic, Row, Col, Modal, List, Tag, Slider, Empty, Tabs, Badge, Avatar, Progress, Alert } from 'antd';
-import { 
-  UserOutlined, 
-  LockOutlined, 
-  NumberOutlined, 
-  SyncOutlined, 
-  HistoryOutlined, 
-  BulbOutlined, 
-  BulbFilled,
-  InfoCircleOutlined,
-  CheckCircleOutlined,
-  CloseCircleOutlined,
-  LoadingOutlined,
-  SettingOutlined,
-  QrcodeOutlined,
-  GithubOutlined,
-  WechatOutlined,
-  AlipayOutlined,
-  ClockCircleOutlined,
-  FireOutlined,
-  TrophyOutlined,
-  HeartOutlined,
-  StarOutlined,
-  BellOutlined,
-  QuestionCircleOutlined,
-  DeleteOutlined,
-  RestOutlined,
-  ReloadOutlined
-} from '@ant-design/icons';
+import { Form, message } from 'antd';
 import Head from 'next/head';
+import { motion, AnimatePresence } from 'framer-motion';
 
-const { Text, Link, Title, Paragraph } = Typography;
-const { TabPane } = Tabs;
+// 导入自定义组件
+import Background from '../components/Background';
+import Header from '../components/Header';
+import StepForm from '../components/StepForm';
+import StatsCard from '../components/StatsCard';
+import HistoryDrawer from '../components/HistoryDrawer';
+import SettingsModal from '../components/SettingsModal';
+import HelpModal from '../components/HelpModal';
+import Footer from '../components/Footer';
 
 const Home = () => {
   const [loading, setLoading] = useState(false);
-  const [darkMode, setDarkMode] = useState(false);
   const [history, setHistory] = useState([]);
   const [showHistory, setShowHistory] = useState(false);
   const [form] = Form.useForm();
@@ -44,30 +23,51 @@ const Home = () => {
   const [useRandom, setUseRandom] = useState(false);
   const [lastUpdate, setLastUpdate] = useState(null);
   const [updateStatus, setUpdateStatus] = useState(null);
-  const [activeTab, setActiveTab] = useState('1');
   const [showSettings, setShowSettings] = useState(false);
   const [showHelp, setShowHelp] = useState(false);
   const [autoUpdate, setAutoUpdate] = useState(false);
   const [autoUpdateInterval, setAutoUpdateInterval] = useState(24); // 小时
   const [notificationEnabled, setNotificationEnabled] = useState(true);
   const [streak, setStreak] = useState(0);
-  const [showQRCode, setShowQRCode] = useState(false);
 
-  // 从 localStorage 加载历史记录和主题设置
+  // 检查 localStorage 是否可用
+  const isLocalStorageAvailable = () => {
+    try {
+      const testKey = '__storage_test__';
+      localStorage.setItem(testKey, testKey);
+      localStorage.removeItem(testKey);
+      return true;
+    } catch (e) {
+      return false;
+    }
+  };
+
+  // 从 localStorage 加载历史记录和设置
   useEffect(() => {
+    // 检查localStorage是否可用
+    if (!isLocalStorageAvailable()) {
+      console.error('localStorage不可用，数据将无法保存');
+      if (notificationEnabled) {
+        message.warning('浏览器存储不可用，您的历史记录和设置将无法保存。');
+      }
+      return;
+    }
+
+    try {
     const savedHistory = localStorage.getItem('stepsHistory');
-    const savedTheme = localStorage.getItem('darkMode');
     const savedAutoUpdate = localStorage.getItem('autoUpdate');
     const savedAutoUpdateInterval = localStorage.getItem('autoUpdateInterval');
     const savedNotificationEnabled = localStorage.getItem('notificationEnabled');
     const savedStreak = localStorage.getItem('streak');
+      const savedRandomRange = localStorage.getItem('randomRange');
+      const savedUseRandom = localStorage.getItem('useRandom');
     
     if (savedHistory) {
-      setHistory(JSON.parse(savedHistory));
+        const parsedHistory = JSON.parse(savedHistory);
+        if (Array.isArray(parsedHistory) && parsedHistory.length > 0) {
+          setHistory(parsedHistory);
+          setLastUpdate(parsedHistory[0]);
     }
-    
-    if (savedTheme) {
-      setDarkMode(savedTheme === 'true');
     }
     
     if (savedAutoUpdate) {
@@ -84,26 +84,50 @@ const Home = () => {
     
     if (savedStreak) {
       setStreak(parseInt(savedStreak));
+      }
+      
+      if (savedRandomRange) {
+        try {
+          const parsedRange = JSON.parse(savedRandomRange);
+          if (Array.isArray(parsedRange) && parsedRange.length === 2) {
+            setRandomRange(parsedRange);
+          }
+        } catch (e) {
+          console.error('解析随机范围出错:', e);
+        }
+      }
+      
+      if (savedUseRandom) {
+        setUseRandom(savedUseRandom === 'true');
+      }
+    } catch (error) {
+      console.error('从本地存储加载数据时出错:', error);
     }
   }, []);
 
-  // 保存历史记录到 localStorage
+  // 保存设置到 localStorage
   useEffect(() => {
+    // 检查localStorage是否可用
+    if (!isLocalStorageAvailable()) {
+      return;
+    }
+
+    try {
+      if (history && Array.isArray(history)) {
     localStorage.setItem('stepsHistory', JSON.stringify(history));
-  }, [history]);
-
-  // 保存主题设置到 localStorage
-  useEffect(() => {
-    localStorage.setItem('darkMode', darkMode);
-    document.body.className = darkMode ? 'dark-mode' : '';
-  }, [darkMode]);
-
-  // 保存自动更新设置到 localStorage
-  useEffect(() => {
-    localStorage.setItem('autoUpdate', autoUpdate);
-    localStorage.setItem('autoUpdateInterval', autoUpdateInterval);
-    localStorage.setItem('notificationEnabled', notificationEnabled);
-  }, [autoUpdate, autoUpdateInterval, notificationEnabled]);
+      }
+      localStorage.setItem('autoUpdate', String(autoUpdate));
+      localStorage.setItem('autoUpdateInterval', String(autoUpdateInterval));
+      localStorage.setItem('notificationEnabled', String(notificationEnabled));
+      localStorage.setItem('randomRange', JSON.stringify(randomRange));
+      localStorage.setItem('useRandom', String(useRandom));
+    } catch (error) {
+      console.error('保存数据到本地存储时出错:', error);
+      if (notificationEnabled) {
+        message.error('保存设置失败，部分功能可能无法正常工作');
+      }
+    }
+  }, [history, autoUpdate, autoUpdateInterval, notificationEnabled, randomRange, useRandom]);
 
   // 生成随机步数
   const generateRandomSteps = () => {
@@ -115,9 +139,20 @@ const Home = () => {
 
   // 清除历史记录
   const clearHistory = () => {
+    try {
     setHistory([]);
+      setLastUpdate(null);
     localStorage.removeItem('stepsHistory');
+      
+      if (notificationEnabled) {
     message.success('历史记录已清除');
+      }
+    } catch (error) {
+      console.error('清除历史记录时出错:', error);
+      if (notificationEnabled) {
+        message.error('清除历史记录失败，请重试');
+      }
+    }
   };
 
   // 从历史记录中恢复
@@ -127,6 +162,27 @@ const Home = () => {
       steps: item.steps
     });
     setShowHistory(false);
+  };
+
+  // 添加历史记录并立即保存到localStorage
+  const addToHistory = (newItem) => {
+    if (!newItem) return;
+    
+    try {
+      const updatedHistory = [newItem, ...history.slice(0, 9)]; // 保留最近的10条
+      setHistory(updatedHistory);
+      setLastUpdate(newItem);
+      
+      // 立即保存到localStorage，确保不会丢失
+      if (isLocalStorageAvailable()) {
+        localStorage.setItem('stepsHistory', JSON.stringify(updatedHistory));
+      }
+    } catch (error) {
+      console.error('添加历史记录时出错:', error);
+      if (notificationEnabled) {
+        message.error('保存历史记录失败');
+      }
+    }
   };
 
   // 自动更新步数
@@ -144,6 +200,7 @@ const Home = () => {
         };
         
         try {
+          setUpdateStatus('loading');
           const response = await axios.post('/api/update-steps', values);
           
           if (response.data.success) {
@@ -159,8 +216,8 @@ const Home = () => {
               timestamp: new Date().toLocaleString()
             };
             
-            setHistory([newHistoryItem, ...history.slice(0, 9)]);
-            setLastUpdate(newHistoryItem);
+            addToHistory(newHistoryItem);
+            setUpdateStatus('success');
             
             // 增加连续更新天数
             setStreak(prev => {
@@ -170,8 +227,9 @@ const Home = () => {
             });
           }
         } catch (error) {
+          setUpdateStatus('error');
           if (notificationEnabled) {
-            message.error('自动更新失败：' + error.message);
+            message.error('自动更新失败：' + (error.response?.data?.message || error.message));
           }
         }
       };
@@ -188,18 +246,26 @@ const Home = () => {
         clearInterval(timer);
       }
     };
-  }, [autoUpdate, autoUpdateInterval, form, randomRange, notificationEnabled]);
+  }, [autoUpdate, autoUpdateInterval, form, randomRange, notificationEnabled, history]);
 
   const onFinish = async (values) => {
     try {
       setLoading(true);
       setUpdateStatus('loading');
       
+      // 如果启用了随机步数，则生成一个随机步数
+      if (useRandom) {
+        values.steps = Math.floor(Math.random() * (randomRange[1] - randomRange[0] + 1)) + randomRange[0];
+      }
+      
       const response = await axios.post('/api/update-steps', values);
       
       if (response.data.success) {
-        message.success('步数更新成功！');
         setUpdateStatus('success');
+        
+        if (notificationEnabled) {
+          message.success('步数更新成功！');
+        }
         
         // 添加到历史记录
         const newHistoryItem = {
@@ -209,8 +275,7 @@ const Home = () => {
           timestamp: new Date().toLocaleString()
         };
         
-        setHistory([newHistoryItem, ...history.slice(0, 9)]);
-        setLastUpdate(newHistoryItem);
+        addToHistory(newHistoryItem);
         
         // 增加连续更新天数
         setStreak(prev => {
@@ -219,443 +284,164 @@ const Home = () => {
           return newStreak;
         });
       } else {
-        message.error(response.data.message || '更新失败');
         setUpdateStatus('error');
+        if (notificationEnabled) {
+          message.error(response.data.message || '更新失败，请稍后重试');
+        }
       }
     } catch (error) {
-      message.error('请求失败：' + error.message);
       setUpdateStatus('error');
+      if (notificationEnabled) {
+        message.error('更新失败：' + (error.response?.data?.message || error.message));
+      }
     } finally {
       setLoading(false);
     }
   };
 
-  // 切换暗色模式
-  const toggleDarkMode = (checked) => {
-    setDarkMode(checked);
-    document.body.classList.toggle('dark-mode', checked);
-  };
+  // 高性能的粒子背景效果
+  // Background组件现在支持：
+  // 1. 响应鼠标移动的交互粒子
+  // 2. 平滑的色彩渐变和动画
+  // 3. 自适应不同设备尺寸
+  // 4. 低性能设备的自动优化
+  // 5. 暗色模式和高对比度模式支持
 
   return (
-    <div className={`app-container ${darkMode ? 'dark-mode' : ''}`}>
+    <>
       <Head>
-        <title>小米运动步数修改器</title>
-        <meta name="description" content="轻松修改小米运动步数，支持随机生成和历史记录" />
+        <title>微信支付宝运动步数修改 - Zepp Life步数修改助手 | 一键同步</title>
+        <meta name="description" content="专业的微信运动、支付宝运动步数一键修改工具，支持一键同步至微信运动、支付宝、钉钉和苹果健康。采用Zepp Life(小米运动)接口，支持随机步数生成、自动定时更新，无需刷固件，安全稳定。" />
+        <meta name="keywords" content="微信运动步数修改,支付宝运动步数修改,微信刷步数,支付宝刷步数,Zepp Life,小米运动,步数同步,钉钉步数,微信运动排名,支付宝运动排名,小米手环,华米手表" />
+        <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0" />
+        <meta name="robots" content="index, follow" />
+        <meta name="author" content="Zepp Life Steps" />
+        
+        {/* Open Graph 标签优化 */}
+        <meta property="og:title" content="微信支付宝运动步数修改 - Zepp Life步数修改助手" />
+        <meta property="og:description" content="专业的微信运动、支付宝运动步数一键修改工具，支持随机生成和自动更新，无需刷固件，100%成功率。" />
+        <meta property="og:type" content="website" />
+        <meta property="og:url" content="https://zepp-life-steps.vercel.app/" />
+        <meta property="og:site_name" content="微信支付宝运动步数修改助手" />
+        <meta property="og:image" content="https://zepp-life-steps.vercel.app/logo.png" />
+        <meta property="og:image:width" content="1200" />
+        <meta property="og:image:height" content="630" />
+        <meta property="og:locale" content="zh_CN" />
+        
+        {/* Twitter 卡片优化 */}
+        <meta name="twitter:card" content="summary_large_image" />
+        <meta name="twitter:title" content="微信支付宝运动步数修改 - 安全稳定的一键同步工具" />
+        <meta name="twitter:description" content="一键修改微信运动、支付宝运动步数，排名靠前不被检测，支持随机生成和自动定时更新。" />
+        <meta name="twitter:image" content="https://zepp-life-steps.vercel.app/logo.png" />
+        
+        {/* 其他重要元标签 */}
+        <meta name="application-name" content="微信支付宝运动步数修改助手" />
+        <meta name="apple-mobile-web-app-title" content="微信支付宝运动步数修改助手" />
+        <meta name="apple-mobile-web-app-capable" content="yes" />
+        <meta name="apple-mobile-web-app-status-bar-style" content="default" />
+        <meta name="format-detection" content="telephone=no" />
+        <meta name="theme-color" content="#6366f1" />
+        
+        {/* 规范链接 */}
+        <link rel="canonical" href="https://zepp-life-steps.vercel.app/" />
         <link rel="icon" href="/favicon.ico" />
+        <link rel="apple-touch-icon" href="/logo.png" />
+        
+        {/* 添加Manifest链接 */}
+        <link rel="manifest" href="/manifest.json" />
+        
+        {/* 预加载关键资源 */}
+        <link rel="preload" href="/logo.png" as="image" />
+        
+        {/* 确保搜索引擎发现sitemap */}
+        <link rel="sitemap" type="application/xml" href="/sitemap.xml" />
+        
+        {/* 结构化数据 - JSON-LD */}
+        <script
+          type="application/ld+json"
+          dangerouslySetInnerHTML={{
+            __html: JSON.stringify({
+              "@context": "https://schema.org",
+              "@type": "WebApplication",
+              "name": "微信支付宝运动步数修改助手",
+              "url": "https://zepp-life-steps.vercel.app/",
+              "description": "专业的微信运动、支付宝运动步数修改工具，通过Zepp Life(小米运动)接口，支持随机步数生成和自动定时更新功能。",
+              "applicationCategory": "HealthApplication",
+              "operatingSystem": "Any",
+              "offers": {
+                "@type": "Offer",
+                "price": "0",
+                "priceCurrency": "CNY"
+              },
+              "author": {
+                "@type": "Organization",
+                "name": "Zepp Life Steps"
+              }
+            })
+          }}
+        />
       </Head>
 
-      <div className="background-shapes">
-        <div className="shape shape-1"></div>
-        <div className="shape shape-2"></div>
-        <div className="shape shape-3"></div>
-        <div className="shape shape-4"></div>
-      </div>
+      <Background />
       
-      <div className="theme-toggle">
-        <Tooltip title={darkMode ? "切换到亮色模式" : "切换到暗色模式"}>
-          <Switch
-            checked={darkMode}
-            onChange={toggleDarkMode}
-            checkedChildren={<BulbFilled />}
-            unCheckedChildren={<BulbOutlined />}
+      <div className="app-container">
+        <div className="app-content">
+          <Header 
+            onShowSettings={() => setShowSettings(true)}
+            onShowHelp={() => setShowHelp(true)}
+            streak={streak}
           />
-        </Tooltip>
+          
+          <StepForm 
+            form={form}
+            onFinish={onFinish}
+            loading={loading}
+            randomRange={randomRange}
+            setRandomRange={setRandomRange}
+            useRandom={useRandom}
+            setUseRandom={setUseRandom}
+            generateRandomSteps={generateRandomSteps}
+          />
+          
+          <StatsCard 
+            lastUpdate={lastUpdate}
+            history={history}
+            streak={streak}
+            clearHistory={clearHistory}
+            showHistory={() => setShowHistory(true)}
+          />
+          
+          <Footer />
+        </div>
       </div>
+
+      <AnimatePresence>
+        {showHistory && (
+          <HistoryDrawer 
+            visible={showHistory}
+            onClose={() => setShowHistory(false)}
+            history={history}
+            restoreFromHistory={restoreFromHistory}
+          />
+        )}
+      </AnimatePresence>
       
-      <div className="header-actions">
-        <Tooltip title="设置">
-          <Button 
-            type="text" 
-            icon={<SettingOutlined />} 
-            onClick={() => setShowSettings(true)}
-            className="header-button"
-          />
-        </Tooltip>
-        <Tooltip title="帮助">
-          <Button 
-            type="text" 
-            icon={<QuestionCircleOutlined />} 
-            onClick={() => setShowHelp(true)}
-            className="header-button"
-          />
-        </Tooltip>
-        <Tooltip title="微信小程序">
-          <Button 
-            type="text" 
-            icon={<QrcodeOutlined />} 
-            onClick={() => setShowQRCode(true)}
-            className="header-button"
-          />
-        </Tooltip>
-      </div>
-
-      <div className="app-content">
-        <div className="glass-card main-card">
-          <div className="card-header">
-            <Title level={2} className="glass-title">小米运动步数修改器</Title>
-            <Text className="glass-subtitle">轻松修改小米运动步数，支持随机生成和历史记录</Text>
-          </div>
-          
-          <Tabs activeKey={activeTab} onChange={setActiveTab} className="glass-tabs">
-            <TabPane tab="修改步数" key="1">
-              <Form
-                form={form}
-                name="steps"
-                onFinish={onFinish}
-                layout="vertical"
-                size="large"
-                className="glass-form"
-              >
-                <Row gutter={16}>
-                  <Col xs={24} sm={12}>
-                    <Form.Item
-                      label="账号"
-                      name="account"
-                      rules={[{ required: true, message: '请输入账号' }]}
-                    >
-                      <Input 
-                        prefix={<UserOutlined />} 
-                        placeholder="请输入手机号或邮箱" 
-                        className="glass-input"
-                      />
-                    </Form.Item>
-                  </Col>
-                  <Col xs={24} sm={12}>
-                    <Form.Item
-                      label="密码"
-                      name="password"
-                      rules={[{ required: true, message: '请输入密码' }]}
-                    >
-                      <Input.Password 
-                        prefix={<LockOutlined />} 
-                        placeholder="请输入密码" 
-                        className="glass-input"
-                      />
-                    </Form.Item>
-                  </Col>
-                </Row>
-
-                <Form.Item
-                  label={
-                    <Space>
-                      步数
-                      <Switch 
-                        size="small" 
-                        checked={useRandom} 
-                        onChange={setUseRandom} 
-                        checkedChildren="随机" 
-                        unCheckedChildren="自定义" 
-                      />
-                    </Space>
-                  }
-                  name="steps"
-                  rules={[{ required: true, message: '请输入步数' }]}
-                >
-                  <Input 
-                    prefix={<NumberOutlined />} 
-                    type="number" 
-                    placeholder="请输入想要修改的步数" 
-                    className="glass-input"
-                    disabled={useRandom}
-                  />
-                </Form.Item>
-
-                {useRandom && (
-                  <Form.Item label="随机步数范围">
-                    <Slider
-                      range
-                      min={1000}
-                      max={100000}
-                      defaultValue={randomRange}
-                      onChange={setRandomRange}
-                      marks={{
-                        1000: '1k',
-                        10000: '10k',
-                        50000: '50k',
-                        100000: '100k'
-                      }}
-                      className="glass-slider"
-                    />
-                    <Button 
-                      type="dashed" 
-                      icon={<SyncOutlined />} 
-                      onClick={generateRandomSteps}
-                      className="glass-button-secondary"
-                    >
-                      生成随机步数
-                    </Button>
-                  </Form.Item>
-                )}
-
-                <Form.Item>
-                  <Button 
-                    type="primary" 
-                    htmlType="submit" 
-                    loading={loading} 
-                    block
-                    className="glass-button"
-                    icon={updateStatus === 'success' ? <CheckCircleOutlined /> : null}
-                  >
-                    {loading ? '更新中...' : '更新步数'}
-                  </Button>
-                </Form.Item>
-              </Form>
-            </TabPane>
-            
-            <TabPane tab="历史记录" key="2">
-              {history.length > 0 ? (
-                <List
-                  dataSource={history}
-                  renderItem={item => (
-                    <List.Item
-                      className="glass-list-item"
-                      actions={[
-                        <Button type="link" onClick={() => restoreFromHistory(item)}>
-                          使用
-                        </Button>
-                      ]}
-                    >
-                      <List.Item.Meta
-                        avatar={<Avatar icon={<UserOutlined />} />}
-                        title={`账号: ${item.account}`}
-                        description={`更新时间: ${item.timestamp}`}
-                      />
-                      <Tag color="blue" className="glass-tag">{item.steps} 步</Tag>
-                    </List.Item>
-                  )}
-                />
-              ) : (
-                <Empty description="暂无历史记录" />
-              )}
-              
-              {history.length > 0 && (
-                <Button 
-                  danger 
-                  onClick={clearHistory}
-                  className="clear-history-button"
-                >
-                  清除历史记录
-                </Button>
-              )}
-            </TabPane>
-            
-            <TabPane tab="数据统计" key="3">
-              <div className="stats-container">
-                <Row gutter={[16, 16]}>
-                  <Col xs={24} sm={12}>
-                    <Card className="glass-card-small">
-                      <Statistic 
-                        title="连续更新天数" 
-                        value={streak} 
-                        prefix={<FireOutlined />}
-                        suffix="天"
-                      />
-                    </Card>
-                  </Col>
-                  <Col xs={24} sm={12}>
-                    <Card className="glass-card-small">
-                      <Statistic 
-                        title="历史记录数" 
-                        value={history.length} 
-                        prefix={<HistoryOutlined />}
-                      />
-                    </Card>
-                  </Col>
-                </Row>
-                
-                {lastUpdate && (
-                  <Card className="glass-card-small last-update-card">
-                    <Title level={4}>上次更新</Title>
-                    <Row gutter={16}>
-                      <Col span={12}>
-                        <Statistic 
-                          title="步数" 
-                          value={lastUpdate.steps} 
-                          suffix="步"
-                        />
-                      </Col>
-                      <Col span={12}>
-                        <Statistic 
-                          title="时间" 
-                          value={lastUpdate.timestamp}
-                          valueStyle={{ fontSize: '14px' }}
-                        />
-                      </Col>
-                    </Row>
-                  </Card>
-                )}
-                
-                {streak > 0 && (
-                  <div className="streak-progress">
-                    <Text>连续更新进度</Text>
-                    <Progress 
-                      percent={Math.min((streak / 30) * 100, 100)} 
-                      status={streak >= 30 ? "success" : "active"}
-                      strokeColor={{
-                        '0%': '#108ee9',
-                        '100%': '#87d068',
-                      }}
-                    />
-                    <Text type="secondary">
-                      {streak >= 30 
-                        ? "恭喜！您已达到30天连续更新目标！" 
-                        : `再坚持${30 - streak}天，即可达到30天连续更新目标！`}
-                    </Text>
-                  </div>
-                )}
-              </div>
-            </TabPane>
-          </Tabs>
-        </div>
-        
-        <div className="action-buttons">
-          <Button 
-            icon={<GithubOutlined />} 
-            href="https://github.com/miloce/Zepp-Life-Steps" 
-            target="_blank"
-            className="glass-button-secondary"
-          >
-            GitHub
-          </Button>
-          <Button 
-            icon={<WechatOutlined />} 
-            onClick={() => setShowQRCode(true)}
-            className="glass-button-secondary"
-          >
-            微信小程序
-          </Button>
-        </div>
-        
-        <div className="glass-footer">
-          <div className="copyright">
-            <Text type="secondary">
-              © 2025 Zepp-Life-Steps
-            </Text>
-            <Text type="secondary">
-              Powered By <Link href="https://github.com/miloce" target="_blank">Miloce</Link>
-            </Text>
-          </div>
-        </div>
-      </div>
-
-      <Modal
-        title="设置"
-        open={showSettings}
-        onCancel={() => setShowSettings(false)}
-        footer={[
-          <Button key="close" onClick={() => setShowSettings(false)}>
-            关闭
-          </Button>
-        ]}
-        width={500}
-        className="glass-modal"
-      >
-        <Form layout="vertical">
-          <Form.Item label="自动更新">
-            <Switch 
-              checked={autoUpdate} 
-              onChange={setAutoUpdate}
-              checkedChildren="开启" 
-              unCheckedChildren="关闭" 
-            />
-          </Form.Item>
-          
-          {autoUpdate && (
-            <>
-              <Form.Item label="更新间隔">
-                <Slider
-                  min={1}
-                  max={48}
-                  value={autoUpdateInterval}
-                  onChange={setAutoUpdateInterval}
-                  marks={{
-                    1: '1小时',
-                    12: '12小时',
-                    24: '24小时',
-                    48: '48小时'
-                  }}
-                />
-                <Text type="secondary">每 {autoUpdateInterval} 小时更新一次</Text>
-              </Form.Item>
-              
-              <Form.Item label="通知">
-                <Switch 
-                  checked={notificationEnabled} 
-                  onChange={setNotificationEnabled}
-                  checkedChildren="开启" 
-                  unCheckedChildren="关闭" 
-                />
-              </Form.Item>
-            </>
-          )}
-        </Form>
-      </Modal>
-
-      <Modal
-        title="帮助"
-        open={showHelp}
-        onCancel={() => setShowHelp(false)}
-        footer={[
-          <Button key="close" onClick={() => setShowHelp(false)}>
-            关闭
-          </Button>
-        ]}
-        width={600}
-        className="glass-modal"
-      >
-        <div className="help-content">
-          <Title level={4}>使用前准备</Title>
-          <ol>
-            <li>下载并注册 Zepp Life（原小米运动）应用</li>
-            <li>在微信中启用微信运动功能</li>
-            <li>在 Zepp Life 中将账户与微信运动绑定
-              <ul>
-                <li>进入 Zepp Life 点击"我的"</li>
-                <li>选择"第三方接入"</li>
-                <li>点击"微信"，最后扫码完成绑定</li>
-              </ul>
-            </li>
-          </ol>
-          
-          <Title level={4}>注意事项</Title>
-          <ul>
-            <li>请合理使用，不要频繁修改步数，以免被系统检测</li>
-            <li>建议每次修改的步数不要超过合理范围（一般不超过 50000 步）</li>
-            <li>请妥善保管您的账号密码，不要分享给他人</li>
-            <li>本工具仅供学习和研究使用，请勿用于非法用途</li>
-          </ul>
-          
-          <Alert
-            message="免责声明"
-            description="本工具仅供学习和研究使用，使用本工具所产生的任何后果由使用者自行承担。我们不对因使用本工具而导致的任何问题负责。"
-            type="warning"
-            showIcon
-          />
-        </div>
-      </Modal>
-
-      <Modal
-        title="微信小程序"
-        open={showQRCode}
-        onCancel={() => setShowQRCode(false)}
-        footer={[
-          <Button key="close" onClick={() => setShowQRCode(false)}>
-            关闭
-          </Button>
-        ]}
-        width={300}
-        className="glass-modal"
-      >
-        <div className="qrcode-container">
-          <img 
-            src="https://jsdelivr.luozhinet.com/gh/miloce/Zepp-Life-Steps/img/MiniProgramCode.png" 
-            alt="微信小程序二维码" 
-            className="qrcode-image"
-          />
-          <Text>扫描二维码使用微信小程序版本</Text>
-        </div>
-      </Modal>
-    </div>
+      <SettingsModal 
+        visible={showSettings}
+        onClose={() => setShowSettings(false)}
+        autoUpdate={autoUpdate}
+        setAutoUpdate={setAutoUpdate}
+        autoUpdateInterval={autoUpdateInterval}
+        setAutoUpdateInterval={setAutoUpdateInterval}
+        notificationEnabled={notificationEnabled}
+        setNotificationEnabled={setNotificationEnabled}
+      />
+      
+      <HelpModal 
+        visible={showHelp}
+        onClose={() => setShowHelp(false)}
+      />
+    </>
   );
 };
 

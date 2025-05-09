@@ -26,7 +26,7 @@
 
 扫描下方二维码，即可使用微信小程序版本，随时随地修改步数！
 
-![微信小程序二维码](https://jsdelivr.luozhinet.com/gh/miloce/Zepp-Life-Steps/img/MiniProgramCode.png)
+![微信小程序二维码](https://static.luozhinet.com/MiniProgramCode.png)
 
 ## 📖 使用方法
 
