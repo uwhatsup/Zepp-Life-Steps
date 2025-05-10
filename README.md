@@ -79,7 +79,7 @@ GET /api/update-steps?account=您的账号&password=您的密码&steps=想要的
 **示例：**
 
 ```
-https://your-domain.com/api/update-steps?account=example@mail.com&password=yourpassword&steps=25000
+https://steps.luozhinet.com/api/update-steps?account=example@mail.com&password=yourpassword&steps=25000
 ```
 
 **返回结果：**
