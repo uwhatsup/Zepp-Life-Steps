@@ -21,6 +21,7 @@
 - 🔒 安全可靠，不会泄露您的账号信息
 - 📊 支持历史记录查看
 - 🔄 自动同步到微信、支付宝运动
+- 🌐 提供API接口，支持POST和GET方式调用
 
 ## 📱 微信小程序版本
 
@@ -43,6 +44,53 @@
 2. 登录您的 Zepp Life 账号
 3. 设置步数并提交
 4. 等待同步完成
+
+### API接口调用
+
+您可以通过POST或GET请求调用接口修改步数，非常适合集成到自动化工具中。
+
+#### POST方式
+
+```
+POST /api/update-steps
+Content-Type: application/json
+
+{
+  "account": "您的账号",
+  "password": "您的密码",
+  "steps": 步数值
+}
+```
+
+#### GET方式
+
+```
+GET /api/update-steps?account=您的账号&password=您的密码&steps=想要的步数
+```
+
+**参数说明：**
+
+| 参数名 | 类型 | 必填 | 说明 |
+|-------|-----|------|------|
+| account | string | 是 | Zepp Life 账号（邮箱或手机号） |
+| password | string | 是 | 账号密码 |
+| steps | number | 否 | 想要修改的步数（不填则随机生成20000-30000之间的步数） |
+
+**示例：**
+
+```
+https://your-domain.com/api/update-steps?account=example@mail.com&password=yourpassword&steps=25000
+```
+
+**返回结果：**
+
+```json
+{
+  "success": true,
+  "message": "步数修改成功: 25000",
+  "data": { ... }
+}
+```
 
 ## 🛠️ 本地开发
 
@@ -92,6 +140,7 @@ npm run dev
 - 请妥善保管您的账号密码，不要分享给他人
 - 本工具仅供学习和研究使用，请勿用于非法用途
 - 使用本工具产生的任何后果由使用者自行承担
+- 使用API接口时，请注意保护您的查询参数，建议在可信网络环境中使用
 
 ## 📝 免责声明
 

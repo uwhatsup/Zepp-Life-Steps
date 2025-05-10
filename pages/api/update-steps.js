@@ -3,19 +3,24 @@ const zeppLifeSteps = require('./ZeppLifeSteps');
 
 // 使用 module.exports 而不是 export default
 module.exports = async function handler(req, res) {
-  if (req.method !== 'POST') {
+  // 支持POST和GET两种请求方式
+  if (req.method !== 'POST' && req.method !== 'GET') {
     return res.status(405).json({ success: false, message: '方法不允许' });
   }
 
   try {
-    const { account, password, steps } = req.body;
+    // 根据请求方法从不同地方获取参数
+    const { account, password, steps } = req.method === 'POST' ? req.body : req.query;
 
     if (!account || !password) {
       return res.status(400).json({ success: false, message: '账号和密码不能为空' });
     }
 
-    // 设置默认步数
-    const targetSteps = steps || Math.floor(Math.random() * 10000) + 20000;
+    // 设置默认步数，对于GET请求，需要将steps参数转为整数
+    const targetSteps = steps ? 
+      (req.method === 'GET' ? parseInt(steps) : steps) : 
+      Math.floor(Math.random() * 10000) + 20000;
+      
     console.log('目标步数:', targetSteps);
 
     // 登录获取token
