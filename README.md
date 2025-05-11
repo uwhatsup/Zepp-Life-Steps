@@ -119,7 +119,7 @@ npm run dev
 
 ## 🚀 部署到 Vercel
 
-想要自己部署一个实例？超级简单！
+想要自己部署一个Vercel实例？超级简单！
 
 [![Deploy with Vercel](https://vercel.com/button)](https://vercel.com/import/project?template=https://github.com/miloce/Zepp-Life-Steps.git)
 
@@ -130,41 +130,58 @@ npm run dev
 ## 🚀 部署到腾讯云 CloudNative Builder (CNB)
 >https://cnb.cool/
 
+腾讯云原生构建（Cloud Native Build，简称 CNB）是腾讯新一代基于代码仓库的持续集成构建平台，它支持环境一致性、分支即环境、秒级启动、构建加速和开源协作等特性。这些特性使得开发者能够更加高效地进行软件开发，无论是持续集成、持续部署、持续交付、远程开发还是开源协作。
  ![CNB 首页](./img/cnb.png)
+
+### [云原生构建（Cloud Native Build）为开发者提供免费算力资源支持](https://docs.cnb.cool/zh/saas/pricing.html#%E8%B5%84%E6%BA%90%E4%BD%BF%E7%94%A8%E8%B4%B9)
+
+| 计费项   | 免费额度      | 使用场景            |
+| ----- | --------- | --------------- |
+| 仓库存储  | 100 GiB   | Git 对象          |
+| 对象存储  | 100 GiB   | 制品、LFS 对象、图片及附件 |
+| 云原生构建 | 160 核时/月  | 云原生构建           |
+| 云原生开发 | 1600 核时/月 | 云原生开发           |
 
 腾讯云提供的云原生构建工具也可以轻松部署本应用：
 
 ### 步骤一：云端快速初始化
 
+1. 登录 cnb.cool 新建仓库
+
+![CNB 新建仓库](./img/cnb-newrepos.png)
+
+2. cnb.cool 提供了便捷的迁移工具。
+
 ![CNB 云端快速初始化](./img/cnb-quick-init.png)
 
-cnb.cool 提供了便捷的迁移工具。登录 cnb.cool 新建仓库，按照提示，在云原生开发环境中执行以下命令迁移仓库，即可完成迁移。
+3. 再选择 WebIDE 进入开发界面，方便快捷。
 
-```text
+![CNB 云端快速初始化](./img/cnb-jump.png)
+
+4. 按照提示，在云原生开发环境中执行以下命令迁移仓库，即可完成迁移。
+
+```ssh
 cnb-init-from https://github.com/miloce/Zepp-Life-Steps
 ```
 
-+ 在执行上述命令后，您会在云原生开发环境的工作区中看到如下克隆与初始化日志：
+ 在执行上述命令后，您会在云原生开发环境的工作区中看到如下克隆与初始化日志：
  ![CNB 克隆与初始化](./img/cnb-workspace-init.png)
-### 步骤二：导入已有项目并部署
+### 步骤二：部署已有项目
+在完成步骤一后，云原生开发环境会自动退出，此时需要重新在仓库页面点击"云原生开发"按钮，启动新的开发环境：
 
-1. 登录腾讯云账号，进入[CloudNative Builder控制台](https://console.cloud.tencent.com/tcb/apps/index)
-2. 创建新应用，选择"导入已有项目"
-3. 授权并选择您的GitHub仓库
-4. 配置构建参数：
-   - 构建命令：`npm run build`
-   - 启动命令：`npm start`
-   - 构建目录：`.next`
-5. 点击"部署应用"，等待部署完成
-6. 访问分配的域名即可使用
+![重新打开云原生开发](./img/cnb-reopen.png)
 
  ### 步骤三：端口转发与预览
 
  1. 在 CNB IDE 底部的 PORTS 面板，点击 `Add Port`，输入端口号 `3000` 并确认。
  2. 等待端口转发完成后，通过 `Forwarded Address` 链接即可在浏览器中访问应用。
- 3. 如果需要持续预览，可将此链接收藏或复制到新的标签页。
 
- ![CNB 端口转发](./img/cnb-port-forward.png)
+![CNB 端口转发](./img/cnb-port-forward.png)
+ 3. 进入转发的网页，填写zepplife账号密码以及步数进行提交。
+ 
+ ![提交请求](./img/CNB-run.png)
+
+
 
 ## ⚙️ 使用前准备
 
