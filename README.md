@@ -131,7 +131,7 @@ npm run dev
 >https://cnb.cool/
 
 腾讯云原生构建（Cloud Native Build，简称 CNB）是腾讯新一代基于代码仓库的持续集成构建平台，它支持环境一致性、分支即环境、秒级启动、构建加速和开源协作等特性。这些特性使得开发者能够更加高效地进行软件开发，无论是持续集成、持续部署、持续交付、远程开发还是开源协作。
- ![CNB 首页](./img/cnb.png)
+ ![CNB 首页](https://cdn.jsdelivr.net/gh/miloce/Zepp-Life-Steps/img/cnb.png)
 
 ### [云原生构建（Cloud Native Build）为开发者提供免费算力资源支持](https://docs.cnb.cool/zh/saas/pricing.html#%E8%B5%84%E6%BA%90%E4%BD%BF%E7%94%A8%E8%B4%B9)
 
@@ -148,15 +148,15 @@ npm run dev
 
 1. 登录 cnb.cool 新建仓库
 
-![CNB 新建仓库](./img/cnb-newrepos.png)
+![CNB 新建仓库](https://cdn.jsdelivr.net/gh/miloce/Zepp-Life-Steps/img/cnb-newrepos.png)
 
 2. cnb.cool 提供了便捷的迁移工具。
 
-![CNB 云端快速初始化](./img/cnb-quick-init.png)
+![CNB 云端快速初始化](https://cdn.jsdelivr.net/gh/miloce/Zepp-Life-Steps/img/cnb-quick-init.png)
 
 3. 再选择 WebIDE 进入开发界面，方便快捷。
 
-![CNB 云端快速初始化](./img/cnb-jump.png)
+![CNB 云端快速初始化](https://cdn.jsdelivr.net/gh/miloce/Zepp-Life-Steps/img/cnb-jump.png)
 
 4. 按照提示，在云原生开发环境中执行以下命令迁移仓库，即可完成迁移。
 
@@ -165,21 +165,21 @@ cnb-init-from https://github.com/miloce/Zepp-Life-Steps
 ```
 
  在执行上述命令后，您会在云原生开发环境的工作区中看到如下克隆与初始化日志：
- ![CNB 克隆与初始化](./img/cnb-workspace-init.png)
+ ![CNB 克隆与初始化](https://cdn.jsdelivr.net/gh/miloce/Zepp-Life-Steps/img/cnb-workspace-init.png)
 ### 步骤二：部署已有项目
 在完成步骤一后，云原生开发环境会自动退出，此时需要重新在仓库页面点击"云原生开发"按钮，启动新的开发环境：
 
-![重新打开云原生开发](./img/cnb-reopen.png)
+![重新打开云原生开发](https://cdn.jsdelivr.net/gh/miloce/Zepp-Life-Steps/img/cnb-reopen.png)
 
  ### 步骤三：端口转发与预览
 
  1. 在 CNB IDE 底部的 PORTS 面板，点击 `Add Port`，输入端口号 `3000` 并确认。
  2. 等待端口转发完成后，通过 `Forwarded Address` 链接即可在浏览器中访问应用。
 
-![CNB 端口转发](./img/cnb-port-forward.png)
+![CNB 端口转发](https://cdn.jsdelivr.net/gh/miloce/Zepp-Life-Steps/img/cnb-port-forward.png)
  3. 进入转发的网页，填写zepplife账号密码以及步数进行提交。
  
- ![提交请求](./img/CNB-run.png)
+ ![提交请求](https://cdn.jsdelivr.net/gh/miloce/Zepp-Life-Steps/img/CNB-run.png)
 
 
 
