@@ -5,8 +5,7 @@
 [![vercel](https://img.shields.io/badge/部署-Vercel-blue?logo=vercel)](https://vercel.com)
 [![微信小程序](https://img.shields.io/badge/微信小程序-可用-green?logo=wechat)](https://mp.weixin.qq.com)
 
-> 通过华米运动的 API 提交运动步数 😒
-> 可实现同步运动步数至微信、支付宝等
+> 通过Zepp Life（原小米运动）API实现了一个运动步数修改工具，支持邮箱和手机号登录方式，可实现同步运动步数至微信、支付宝等。
 
 ## 📱 在线体验
 
@@ -127,6 +126,34 @@ npm run dev
 1. 将代码推送到 GitHub 仓库
 2. 在 Vercel 中导入该仓库
 3. Vercel 将自动部署你的应用
+
+## 🚀 部署到腾讯云 CloudNative Builder (CNB)
+
+腾讯云提供的云原生构建工具也可以轻松部署本应用：
+
+### 步骤一：云端快速初始化
+
+![CNB 云端快速初始化](./img/cnb-quick-init.png)
+
+cnb.cool 提供了便捷的迁移工具。登录 cnb.cool 新建仓库，按照提示，在云原生开发环境中执行以下命令迁移仓库，即可完成迁移。
+
+```text
+cnb-init-from https://github.com/miloce/Zepp-Life-Steps
+```
+
++ 在执行上述命令后，您会在云原生开发环境的工作区中看到如下克隆与初始化日志：
+ ![CNB 克隆与初始化](./img/cnb-workspace-init.png)
+### 步骤二：导入已有项目并部署
+
+1. 登录腾讯云账号，进入[CloudNative Builder控制台](https://console.cloud.tencent.com/tcb/apps/index)
+2. 创建新应用，选择"导入已有项目"
+3. 授权并选择您的GitHub仓库
+4. 配置构建参数：
+   - 构建命令：`npm run build`
+   - 启动命令：`npm start`
+   - 构建目录：`.next`
+5. 点击"部署应用"，等待部署完成
+6. 访问分配的域名即可使用
 
 ## ⚙️ 使用前准备
 
