@@ -128,6 +128,9 @@ npm run dev
 3. Vercel 将自动部署你的应用
 
 ## 🚀 部署到腾讯云 CloudNative Builder (CNB)
+>https://cnb.cool/
+
+ ![CNB 首页](./img/cnb.png)
 
 腾讯云提供的云原生构建工具也可以轻松部署本应用：
 
@@ -154,6 +157,14 @@ cnb-init-from https://github.com/miloce/Zepp-Life-Steps
    - 构建目录：`.next`
 5. 点击"部署应用"，等待部署完成
 6. 访问分配的域名即可使用
+
+ ### 步骤三：端口转发与预览
+
+ 1. 在 CNB IDE 底部的 PORTS 面板，点击 `Add Port`，输入端口号 `3000` 并确认。
+ 2. 等待端口转发完成后，通过 `Forwarded Address` 链接即可在浏览器中访问应用。
+ 3. 如果需要持续预览，可将此链接收藏或复制到新的标签页。
+
+ ![CNB 端口转发](./img/cnb-port-forward.png)
 
 ## ⚙️ 使用前准备
 
