@@ -29,6 +29,10 @@
 
 ![微信小程序二维码](https://static.luozhinet.com/MiniProgramCode.png)
 
+## 📸 应用界面
+
+![Zepp Life 步数修改助手界面](./img/app-interface.png)
+
 ## 📖 使用方法
 
 ### Web 版本
