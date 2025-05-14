@@ -1,8 +1,8 @@
 // 使用 require 而不是 import，避免 ES 模块问题
 const zeppLifeSteps = require('./ZeppLifeSteps');
 
-// 使用 module.exports 而不是 export default
-module.exports = async function handler(req, res) {
+// 将 module.exports 修改为 export default
+export default async function handler(req, res) {
   // 支持POST和GET两种请求方式
   if (req.method !== 'POST' && req.method !== 'GET') {
     return res.status(405).json({ success: false, message: '方法不允许' });

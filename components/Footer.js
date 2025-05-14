@@ -58,7 +58,7 @@ const Footer = () => {
           <div className="qrcode-container glass-card-small">
             <Text className="qrcode-title">微信小程序版</Text>
             <Image 
-              src="https://static.luozhinet.com/MiniProgramCode.png" 
+              src="https://cdn.jsdelivr.net/gh/miloce/Zepp-Life-Steps/img/MiniProgramCode.png" 
               alt="微信小程序二维码" 
               className="qrcode-image"
               width={120}
